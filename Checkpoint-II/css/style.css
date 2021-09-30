@@ -1,7 +1,7 @@
 /* Global =============================*/
 :root{
     --dark-blue: #363F5F;
-    --main-color:#05beaf;
+    --main-color:#bd23fa;
     --main-clear-color: #2ecad8;
     --red: #e92929;
 }
@@ -50,8 +50,8 @@ h2 {
 /* Links & Buttons =============================*/
 
 div.links {
-    display: flex;
-    justify-content: space-between
+ display: flex;
+ justify-content: space-between
 }
 
 a {
@@ -86,17 +86,17 @@ button:hover {
 }
 
 .button.cancel {
-    color: var(--red);
-    border: 2px var(--red) solid;
-    border-radius: 0.25rem;
+     color: var(--red);
+     border: 2px var(--red) solid;
+     border-radius: 0.25rem;
 
-    height: 50px;
+     height: 50px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    opacity: 0.7;
+     opacity: 0.7;
 }
 
 .button.cancel:hover {
@@ -119,6 +119,12 @@ header h1 {
 
 
 /* Table =============================*/
+#tarefas {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+}
+
 #data-table {
     width: 100%;
     border-spacing: 0 0.5rem;
@@ -144,6 +150,7 @@ table thead th {
 }
 
 table tbody tr {
+    background: #FFF;
     opacity: 0.7;
 }
 
@@ -255,14 +262,14 @@ footer {
 
 /* Responsive =============================*/
 @media (min-width: 800px) {
-    html {
-        font-size: 85.2%;
-    }
+     html {
+         font-size: 85.2%;
+     }
 
-    header h1 {
+     header h1 {
         color: #FFF;
         font-size: 100%;
-        font-weight: 500;
-    }
+       font-weight: 500;
+     }
 }
 

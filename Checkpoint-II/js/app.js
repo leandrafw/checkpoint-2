@@ -1,23 +1,23 @@
 const Modal = {
-    
-    open(){
-      document
+
+    open() {
+        document
             .querySelector(".modal-overlay")
             .classList
             .add("active")
 
     },
 
-    close(){
-      document
+    close() {
+        document
             .querySelector(".modal-overlay")
             .classList
             .remove("active")
-      document
+        document
             .querySelector("div#form >h2")
             .innerText = 'Nova Tarefa'
-      
-       Form.limparCampos()
+
+        Form.limparCampos()
     }
 }
 
@@ -28,7 +28,7 @@ const Storage = {
         return items
     },
     set(tarefas) {
-       localStorage.setItem("minhastarefas", JSON.stringify(tarefas))
+        localStorage.setItem("minhastarefas", JSON.stringify(tarefas))
     },
 }
 
@@ -39,7 +39,7 @@ const Tarefa = {
         Tarefa.all.push(tarefa)
 
         App.reload()
-        editar()
+        editarTarefa()
     },
 
     remove(index) {
@@ -48,7 +48,7 @@ const Tarefa = {
         if (excluir) {
 
             Tarefa.all.splice(index, 1)
-    
+
             App.reload()
         }
     }
@@ -65,17 +65,17 @@ const DOM = {
 
         DOM.tarefasContainer.appendChild(tr)
     },
-    
+
     innerHTMLTarefa(tarefa, index) {
 
         let date = new Date();
 
         const html = `
-            <td class="descricao">${tarefa.descricao}</td>
+            <td class="descricao">${tarefa.descricao.substring(0, 30) + '...'}</td>
             <td class="data-de-adicao">${date.toLocaleDateString()}</td>
             <td class ="date">${tarefa.date}</td>
             <td class="checkbox-del">
-              <span class="editar">edit</span>
+            <img src="./assets/edit.svg" class="editar">
               <input type="checkbox" name="checkbox" class="checkbox">
               <img onclick="Tarefa.remove(${index})" src="./assets/minus.svg" alt="Remover Tarefa">
             </td>
@@ -87,7 +87,7 @@ const DOM = {
         DOM.tarefasContainer.innerHTML = ""
     }
 
-    
+
 }
 
 const Utils = {
@@ -116,22 +116,24 @@ const Form = {
             date: Form.date.value,
             completed: false
         }
-   },
+    },
 
-   validateFields() {
+    validateFields() {
         const { descricao, date } = Form.getValues()
-    
-            if( descricao.trim() === "" || 
-                date.trim() === "") {
-                throw new Error("Por favor, preencha todos os campos.")
-         }
+
+        if (descricao.trim() === "" ||
+            date.trim() === "") {
+            throw new Error("Por favor, preencha todos os campos.")
+        } else if (descricao.length < 10) {
+            throw new Error("Por favor, coloque mais de 10 caracteres na descrição da tarefa.")
+        }
     },
 
     formatValues() {
-        let { descricao, date, completed} = Form.getValues()
-    
+        let { descricao, date, completed } = Form.getValues()
+
         date = Utils.formatDate(date)
-    
+
         return {
             descricao,
             date,
@@ -142,11 +144,11 @@ const Form = {
     limparCampos() {
         Form.descricao.value = ""
         Form.date.value = ""
-      },
+    },
 
-      submit(event) {
+    submit(event) {
         event.preventDefault()
-        
+
         try {
             Form.validateFields()
             const tarefa = Form.formatValues()
@@ -156,47 +158,47 @@ const Form = {
         } catch (error) {
             alert(error.message)
         }
-        
-  }
+
+    }
 }
 
 const App = {
     init() {
-     
+
         Tarefa.all.forEach(DOM.addTarefa)
 
         Storage.set(Tarefa.all)
-        
-        },
+
+    },
 
     reload() {
-            DOM.limparTarefas()
-            App.init()
-            finalizar()
-        }
+        DOM.limparTarefas()
+        App.init()
+        tarefaConcluida()
+    }
 }
 
 App.init()
 
-function finalizar() {
+function tarefaConcluida() {
     const checkbox = document.querySelectorAll('.checkbox')
     const tr = document.querySelectorAll('tbody > tr')
 
-    for(let i = 0; i < checkbox.length; i++) {
-        
-        checkbox[i].addEventListener('change', function() {
-            
-            if(this.checked){
+    for (let i = 0; i < checkbox.length; i++) {
+
+        checkbox[i].addEventListener('change', function () {
+
+            if (this.checked) {
                 tr[i].style.opacity = 0.27
-                
+
                 let checked = Storage.get('minhastarefas')[i]
                 checked.completed = true
-                
+
                 let all = Storage.get('minhastarefas')
                 all[i] = checked
-        
+
                 Storage.set(all)
-                 
+
             } else {
                 tr[i].style.opacity = 0.7
 
@@ -210,76 +212,61 @@ function finalizar() {
             }
         })
 
-        if(Storage.get('minhastarefas')[i].completed === true) {
+        if (Storage.get('minhastarefas')[i].completed === true) {
             tr[i].style.opacity = 0.27
             checkbox[i].checked = true
         }
     }
 }
-finalizar()
+tarefaConcluida()
 
-function editar () {
+function editarTarefa() {
     const editar = document.querySelectorAll('.editar')
 
     let item = 0
     let clicked = false
-    
-    for(let i = 0; i < editar.length; i++) {
+
+    for (let i = 0; i < editar.length; i++) {
         let descricao = Storage.get('minhastarefas')[i].descricao
         let data = Utils.convertDate(Storage.get('minhastarefas')[i].date)
-       
+
         editar[i].addEventListener('click', () => {
             document.querySelector('div#form > h2').innerText = 'Atualizar Tarefa'
             document.querySelector('.input-group #descricao').value = descricao
             document.querySelector('.input-group #date').valueAsDate = data;
-       
+
             item = i
             clicked = true
 
-            if(clicked) {
+            if (clicked) {
 
                 Modal.open()
-                
+
                 document.querySelector("button").addEventListener("click", (e) => {
 
-                        e.preventDefault()
+                    e.preventDefault()
 
-                        let newEdit = Storage.get('minhastarefas')[item]
-                        
-                        newEdit.descricao =  document.querySelector('.input-group #descricao').value
-                        newEdit.date = Utils.formatDate(document.querySelector('.input-group #date').value)
-                        
-                        let edited = Storage.get('minhastarefas')
-                        edited[item] = newEdit
-                        Storage.set(edited)    
-                
-                        
-                        document.querySelector('form').setAttribute('onsubmit', 'Form.submit(event)')
-                        document.querySelectorAll('.descricao')[item].innerText = newEdit.descricao
-                        document.querySelectorAll('.date')[item].innerText = newEdit.date
+                    let newEdit = Storage.get('minhastarefas')[item]
 
-                        
-                        clicked = false
-                        Modal.close()
+                    newEdit.descricao = document.querySelector('.input-group #descricao').value
+                    newEdit.date = Utils.formatDate(document.querySelector('.input-group #date').value)
+
+                    let edited = Storage.get('minhastarefas')
+                    edited[item] = newEdit
+                    Storage.set(edited)
+
+
+                    document.querySelector('form').setAttribute('onsubmit', 'Form.submit(event)')
+                    document.querySelectorAll('.descricao')[item].innerText = newEdit.descricao
+                    document.querySelectorAll('.date')[item].innerText = newEdit.date
+
+
+                    clicked = false
+                    Modal.close()
                 })
             }
         })
-   }
+    }
 }
-editar()
-
-
-let headersList = {
-    "Accept": "*/*",
-    "User-Agent": "Thunder Client (https://www.thunderclient.io)"
-   }
-   
-   fetch("https://jsonplaceholder.typicode.com/todos/", { 
-     method: "GET",
-     headers: headersList
-   }).then(function(response) {
-     return response.text();
-   }).then((data) => data);
-
-
+editarTarefa()
 
